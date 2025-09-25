@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EstateEase - Property Detail</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1 class="logo">EstateEase</h1>
+      <a href="index.html" class="back-link">← Back to Listings</a>
+    </div>
+  </header>
+
+  <main class="container" id="detail-root">
+    <div id="loading">Loading...</div>
+  </main>
+
+  <script>
+  async function load(){
+    const urlParams = new URLSearchParams(location.search);
+    const id = urlParams.get('id');
+    if(!id){ document.getElementById('loading').innerText='No id provided'; return; }
+    const res = await fetch(`./api/get_listing.php?id=${encodeURIComponent(id)}`);
+    if(!res.ok){ document.getElementById('loading').innerText='Error loading'; return; }
+    const data = await res.json();
+    const root = document.getElementById('detail-root');
+    root.innerHTML = `
+      <article class="property-detail">
+        <div class="detail-grid">
+          <div class="image-col">
+            <img src="${data.image_url || 'https://via.placeholder.com/600x400?text=EstateEase'}" alt="${data.title}">
+          </div>
+          <div class="info-col">
+            <h2>${data.title}</h2>
+            <p class="price">₹${parseFloat(data.price).toLocaleString('en-IN')}</p>
+            <p class="meta">📍 ${data.city} • ${data.property_type}</p>
+            <div class="badges">
+              <span>${data.bedrooms} Bedrooms</span>
+              <span>${data.bathrooms} Bathrooms</span>
+              <span>${data.area_sq_m} m²</span>
+            </div>
+            <p class="description">${data.description}</p>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+  load();
+  </script>
+</body>
+</html>
